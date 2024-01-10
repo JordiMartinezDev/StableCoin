@@ -31,7 +31,7 @@ import {Ownable} from "@openzeppelin/contracts/access/Ownable.sol";
 pragma solidity ^0.8.18;
 
 /**
- * @title 
+ * @title DecentralizedStableCoin
  * @author Patrick Collins - Jordi Martinez Following Patrick's Youtube course
  * Collateral: Exogenous (ETH & BTC)
  * Minting: Algorithmic

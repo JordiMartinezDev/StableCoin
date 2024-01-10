@@ -62,6 +62,14 @@ contract DSCEngine is ReentrancyGuard {
 
     DecentralizedStableCoin private immutable i_dsc;
 
+    // ---------- Events ---------- //
+
+    event CollateralDeposited(
+        address indexed user,
+        address indexed token,
+        uint256 amount
+    );
+
     // ---------- Modifiers ---------- //
 
     modifier moreThanZero(uint256 amount) {

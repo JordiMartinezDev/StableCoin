@@ -27,6 +27,8 @@
 
 pragma solidity ^0.8.18;
 
+import {DecentralizedStableCoin} from "./DecentralizedStableCoin.sol";
+
 /**
  * @title DSCEngine
  * @author Patrick Collins - Jordi Martinez Following Patrick's Youtube course
@@ -48,8 +50,70 @@ pragma solidity ^0.8.18;
 
 contract DSCEngine{
 
-    constructor(){
+    // ---------- Errors ---------- //
+
+    error DSCEngine__NeedsMoreThanZero();
+    error DSCEngine__TokenAddressesAndPriceFeedMustBeSameLength();
+
+
+    // ---------- State variables ---------- //
+
+    mapping(address token => address priceFeed) private s_priceFeeds; // TokenToPriceFeed
+    DecentralizedStableCoin private immutable i_dsc;
+
+
+
+    // ---------- Modifiers ---------- //
+
+    modifier moreThanZero(uint256 amount){
+
+        if(amount <= 0) revert DSCEngine__NeedsMoreThanZero();
+
+        _;
+    }
+
+    // ---------- Functions ---------- //
+
+
+     constructor(address[] memory tokenAddresses, address[] memory priceFeedAddresses, address dscAddress){
+
+        if(tokenAddresses.length != priceFeedAddresses.length) revert DSCEngine__TokenAddressesAndPriceFeedMustBeSameLength();
+
+        for(uint256 i=0; i < tokenAddresses.length;i++){
+            s_priceFeeds[tokenAddresses[i]] = priceFeedAddresses[i];
+        }
+        i_dsc = DecentralizedStableCoin(dscAddress);
+    }
+
+    // ---------- External Functions ---------- //
+
+    function depositCollateralAndMintDSC() external{
+
+    }
+
+    /**
+ * @param tokenCollateralAddress The address of the token to deposit collateral
+ * @param amountCollateral The amount of collateral to deposit
+ */
+    function depositCollateral(address tokenCollateralAddress,uint256 amountCollateral) external moreThanZero(amountCollateral){
+
+    }
+    function redeemCollateralForDSC() external{
+
+    }
+    function redeemCollateral() external{}
+
+    function mintDSC() external{}
+
+    function burnDSC() external{
+
+    }
+
+    function liquidate() external{
 
     }
     
+    function getHealthFactor() external{
+
+    }
 }

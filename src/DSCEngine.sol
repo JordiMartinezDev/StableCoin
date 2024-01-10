@@ -114,6 +114,12 @@ contract DSCEngine is ReentrancyGuard {
         s_collateralDeposited[msg.sender][
             tokenCollateralAddress
         ] += amountCollateral;
+
+        emit CollateralDeposited(
+            msg.sender,
+            tokenCollateralAddress,
+            amountCollateral
+        );
     }
 
     function redeemCollateralForDSC() external {}

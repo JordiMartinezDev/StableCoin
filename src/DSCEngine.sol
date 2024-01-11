@@ -27,6 +27,7 @@ pragma solidity ^0.8.18;
 
 import {DecentralizedStableCoin} from "./DecentralizedStableCoin.sol";
 import {ReentrancyGuard} from "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
+import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 
 /**
  * @title DSCEngine
@@ -107,6 +108,7 @@ contract DSCEngine is ReentrancyGuard {
     function depositCollateralAndMintDSC() external {}
 
     /**
+     * @notice follows CEI ( checks, effects, interactions )
      * @param tokenCollateralAddress The address of the token to deposit collateral
      * @param amountCollateral The amount of collateral to deposit
      */
@@ -126,6 +128,11 @@ contract DSCEngine is ReentrancyGuard {
         emit CollateralDeposited(
             msg.sender,
             tokenCollateralAddress,
+            amountCollateral
+        );
+        IERC20(tokenCollateralAddress).transferFrom(
+            msg.sender,
+            address(this),
             amountCollateral
         );
     }

@@ -59,6 +59,7 @@ contract DSCEngine is ReentrancyGuard {
 
     mapping(address token => address priceFeed) private s_priceFeeds; // TokenToPriceFeed
     mapping(address user => mapping(address token => uint256 amount)) private s_collateralDeposited;
+    mapping(address user => uint256 amountDscMinted) private s_DSCminted;
 
     DecentralizedStableCoin private immutable i_dsc;
 
@@ -121,9 +122,16 @@ contract DSCEngine is ReentrancyGuard {
 
     function redeemCollateral() external {}
 
+    /**
+     * @notice follows CEI
+     * @param amountDscToMint The amount of stableCoin to mint
+     * @notice They must have more collateral than minimum threshold
+     */
+
     // 1. Check if the collateral value > DSC amount
     function mintDSC(uint256 amountDscToMint) external moreThanZero(amountDscToMint) nonReentrant{
-        
+        s_DSCminted(msg.sender) += amountDscToMint;
+        //if they minted too much
     }
 
     function burnDSC() external {}

@@ -58,6 +58,8 @@ contract DSCEngine is ReentrancyGuard {
 
     // ---------- State variables ---------- //
 
+    uint256 private constant LIQUIDATION_THRESHOLD = 50;
+
     mapping(address token => address priceFeed) private s_priceFeeds; // TokenToPriceFeed
     mapping(address user => mapping(address token => uint256 amount)) private s_collateralDeposited;
     mapping(address user => uint256 amountDscMinted) private s_DSCminted;
@@ -157,12 +159,15 @@ contract DSCEngine is ReentrancyGuard {
     /**
      * Returns how close to liquidation a user is
      * If user goes below 1, they can get liquidated
-     * @param user 
+     * @param user TestParam
+     *
      */
 
     function healthFactor(address user) private view returns(uint256){
 
             (uint256 totalDscMinted,uint256 collateralValueInUsd) = _getAccountInformation(user);
+            uint256 collateralAdjustedForThreshold = (collateralValueInUsd * LIQUIDATION_THRESHOLD) / 100;
+            return collateralAdjustedForThreshold;   
     }
 
     function _revertIfHealthFactorIsBroken() internal view {
@@ -176,7 +181,7 @@ contract DSCEngine is ReentrancyGuard {
 
     // ---------- Public & External View Functions ---------- //
 
-    function getAccountCollateralValue(address user) public view returns(uint256){
+    function getAccountCollateralValue(address user) public view returns(uint256 totalCollateralValueInUsd){
         // loop through each collateral token, get the amount they have deposited 
         // map it to the price to get value in USD
 
@@ -186,11 +191,20 @@ contract DSCEngine is ReentrancyGuard {
 
             // We need the amount to be calculated in USD now
 
+            totalCollateralValueInUsd += getUsdValue(token, amount); 
+
         }
     }
+
+
         function getUsdValue(address token,uint256 amount) public view returns(uint256){
 
+            AggregatorV3Interface priceFeed = AggregatorV3Interface(s_priceFeeds[token]);
+            
+            // Times 1e10 because amount is in 1e18 and priceFeed in 1e8, so we need to convert everything to 1e18
+            // This is detailed in chainlink priceFeed docs, in ETH / USD details
 
+            return ((uint256(price) * 1e10) * amount) / 1e18; 
         }
     
 

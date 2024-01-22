@@ -28,6 +28,7 @@ pragma solidity ^0.8.18;
 import {DecentralizedStableCoin} from "./DecentralizedStableCoin.sol";
 import {ReentrancyGuard} from "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
 import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+import {AggregatorV3Interface} from "@chainlink/contracts/src/v0.8/interfaces/AggregatorV3Interface.sol";
 
 /**
  * @title DSCEngine
@@ -60,8 +61,11 @@ contract DSCEngine is ReentrancyGuard {
     mapping(address token => address priceFeed) private s_priceFeeds; // TokenToPriceFeed
     mapping(address user => mapping(address token => uint256 amount)) private s_collateralDeposited;
     mapping(address user => uint256 amountDscMinted) private s_DSCminted;
+    address[] private s_collateralTokens;
+
 
     DecentralizedStableCoin private immutable i_dsc;
+
 
     // ---------- Events ---------- //
 
@@ -91,6 +95,7 @@ contract DSCEngine is ReentrancyGuard {
 
         for (uint256 i = 0; i < tokenAddresses.length; i++) {
             s_priceFeeds[tokenAddresses[i]] = priceFeedAddresses[i];
+            s_collateralTokens.push(tokenAddresses[i]);
         }
         i_dsc = DecentralizedStableCoin(dscAddress);
     }
@@ -174,6 +179,19 @@ contract DSCEngine is ReentrancyGuard {
     function getAccountCollateralValue(address user) public view returns(uint256){
         // loop through each collateral token, get the amount they have deposited 
         // map it to the price to get value in USD
+
+        for(uint256 i; i < s_collateralTokens.length; i++){
+            address token = s_collateralTokens[i];
+            uint256 amount = s_collateralDeposited[user][token];
+
+            // We need the amount to be calculated in USD now
+
+        }
     }
+        function getUsdValue(address token,uint256 amount) public view returns(uint256){
+
+
+        }
+    
 
 }

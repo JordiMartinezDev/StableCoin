@@ -143,6 +143,12 @@ contract DSCEngine is ReentrancyGuard {
 
     // ---------- Private & Internal View Functions ---------- //
 
+    function getAccountInformation(address user) private view returns(uint256 totalDscMinted, uint256 collateralValueInUsd){
+
+        totalDscMinted = s_DSCminted[user];
+        collateralValueInUsd = getAccountCollateralInformation(user);
+    }
+
     /**
      * Returns how close to liquidation a user is
      * If user goes below 1, they can get liquidated
@@ -151,6 +157,7 @@ contract DSCEngine is ReentrancyGuard {
 
     function healthFactor(address user) private view returns(uint256){
 
+            (uint256 totalDscMinted,uint256 collateralValueInUsd) = _getAccountInformation(user);
     }
 
     function _revertIfHealthFactorIsBroken() internal view {
@@ -160,6 +167,13 @@ contract DSCEngine is ReentrancyGuard {
 
 
 
+    }
+
+    // ---------- Public & External View Functions ---------- //
+
+    function getAccountCollateralValue(address user) public view returns(uint256){
+        // loop through each collateral token, get the amount they have deposited 
+        // map it to the price to get value in USD
     }
 
 }

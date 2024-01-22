@@ -55,10 +55,12 @@ contract DSCEngine is ReentrancyGuard {
     error DSCEngine__TokenAddressesAndPriceFeedMustBeSameLength();
     error DSCEngine__NotAllowedToken();
     error DSCEngine__TransferFailed();
+    error DSCEngine__BreaksHealthFactor(uint256 healthFactor);
 
     // ---------- State variables ---------- //
 
     uint256 private constant LIQUIDATION_THRESHOLD = 50;
+    uint256 private constant MIN_HEALTH_FACTOR = 1;
 
     mapping(address token => address priceFeed) private s_priceFeeds; // TokenToPriceFeed
     mapping(address user => mapping(address token => uint256 amount)) private s_collateralDeposited;
@@ -137,9 +139,9 @@ contract DSCEngine is ReentrancyGuard {
 
     // 1. Check if the collateral value > DSC amount
     function mintDSC(uint256 amountDscToMint) external moreThanZero(amountDscToMint) nonReentrant{
-        s_DSCminted(msg.sender) += amountDscToMint;
+        s_DSCminted[msg.sender] += amountDscToMint;
         //if they minted too much
-        revertIfHealthFactorIsBroken();
+        _revertIfHealthFactorIsBroken(msg.sender);
     }
 
     function burnDSC() external {}
@@ -150,10 +152,10 @@ contract DSCEngine is ReentrancyGuard {
 
     // ---------- Private & Internal View Functions ---------- //
 
-    function getAccountInformation(address user) private view returns(uint256 totalDscMinted, uint256 collateralValueInUsd){
+    function _getAccountInformation(address user) private view returns(uint256 totalDscMinted, uint256 collateralValueInUsd){
 
         totalDscMinted = s_DSCminted[user];
-        collateralValueInUsd = getAccountCollateralInformation(user);
+        collateralValueInUsd = getAccountCollateralValue(user);
     }
 
     /**
@@ -171,13 +173,13 @@ contract DSCEngine is ReentrancyGuard {
 
     }
 
-    function _revertIfHealthFactorIsBroken() internal view {
-
-        // 1. Check the health factor ( do they have enough collateral ? )
-        // 2. Revert if they don't
-
-
-
+    // 1. Check the health factor ( do they have enough collateral ? )
+    // 2. Revert if they don't
+    function _revertIfHealthFactorIsBroken(address user) internal view {
+        uint256 userHealthFactor = _healthFactor(user);
+        if(userHealthFactor < MIN_HEALTH_FACTOR){
+            revert DSCEngine__BreaksHealthFactor(userHealthFactor);
+        }
     }
 
     // ---------- Public & External View Functions ---------- //
@@ -201,7 +203,7 @@ contract DSCEngine is ReentrancyGuard {
         function getUsdValue(address token,uint256 amount) public view returns(uint256){
 
             AggregatorV3Interface priceFeed = AggregatorV3Interface(s_priceFeeds[token]);
-            
+            (, int256 price,,,) = priceFeed.latestRoundData();
             // Times 1e10 because amount is in 1e18 and priceFeed in 1e8, so we need to convert everything to 1e18
             // This is detailed in chainlink priceFeed docs, in ETH / USD details
 

@@ -14,7 +14,7 @@ contract DeployDSC is Script{
     address[] public priceFeedAddresses;
 
 
-    function run() external returns(DecentralizedStableCoin, DSCEngine ){
+    function run() external returns(DecentralizedStableCoin, DSCEngine, HelperConfig){
 
         HelperConfig config = new HelperConfig();
 
@@ -32,7 +32,7 @@ contract DeployDSC is Script{
 
         vm.stopBroadcast();
 
-        return(dsc,engine);
+        return(dsc,engine, config);
     }
 
 }

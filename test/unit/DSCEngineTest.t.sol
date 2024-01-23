@@ -22,7 +22,7 @@ contract DSCEngineTest is Test{
 
     function setUp() public{
 
-        deployer = new Deployer();
+        deployer = new DeployDSC();
 
         (dsc,dsce,config) = deployer.run();
         (ethUsdPriceFeed,,weth,,) = config.activeNetworkConfig();
@@ -32,7 +32,13 @@ contract DSCEngineTest is Test{
     // --------- Price Tests ---------
 
     function testGetUsdValue() public{
-        
+        uint256 ethAmount = 15e18;
+
+        uint256 expectedUsd = 30000e18;
+        uint256 actualUsd = dsce.getUsdValue(weth,ethAmount);
+
+        assertEq(expectedUsd, actualUsd);
+
     }
 
 }

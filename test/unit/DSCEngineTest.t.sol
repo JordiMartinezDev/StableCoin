@@ -20,6 +20,14 @@ contract DSCEngineTest is Test{
     address btcUsdPriceFeed;
     address wbtc;
 
+    modifier depositedCollateral() {
+        vm.startPrank(user);
+        ERC20Mock(weth).approve(address(dsce), amountCollateral);
+        dsce.depositCollateral(weth, amountCollateral);
+        vm.stopPrank();
+        _;
+    }
+
     function setUp() public{
 
         deployer = new DeployDSC();

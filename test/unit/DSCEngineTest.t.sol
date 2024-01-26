@@ -78,4 +78,11 @@ contract DSCEngineTest is Test{
         vm.stopPrank();
     }
 
+    // ----------- Minting tests -----------
+
+    function testCanDepositCollateralWithoutMinting() public depositedCollateral {
+        uint256 userBalance = dsc.balanceOf(user);
+        assertEq(userBalance, 0);
+    }
+
 }

@@ -50,8 +50,6 @@ contract DSCEngineTest is Test{
     }
 
 
-
-
     function testRevertsIfTokenLengthDoesntMatchPriceFeeds() public {
         tokenAddresses.push(weth);
         feedAddresses.push(ethUsdPriceFeed);
@@ -60,6 +58,13 @@ contract DSCEngineTest is Test{
         vm.expectRevert(DSCEngine.DSCEngine__TokenAddressesAndPriceFeedAddressesAmountsDontMatch.selector);
         new DSCEngine(tokenAddresses, feedAddresses, address(dsc));
     }
+
+
+    // ----------- Minting tests -----------
+
+    
+
+    // ----------- Deposit Collateral tests -----------
 
     function testRevertsIfCollateralZero() public {
         vm.startPrank(user);
@@ -70,19 +75,17 @@ contract DSCEngineTest is Test{
         vm.stopPrank();
     }
 
+    function testCanDepositCollateralWithoutMinting() public depositedCollateral {
+        uint256 userBalance = dsc.balanceOf(user);
+        assertEq(userBalance, 0);
+    }
+
     function testRevertsWithUnapprovedCollateral() public {
         ERC20Mock randToken = new ERC20Mock("RAN", "RAN", user, 100e18);
         vm.startPrank(user);
         vm.expectRevert(abi.encodeWithSelector(DSCEngine.DSCEngine__TokenNotAllowed.selector, address(randToken)));
         dsce.depositCollateral(address(randToken), amountCollateral);
         vm.stopPrank();
-    }
-
-    // ----------- Minting tests -----------
-
-    function testCanDepositCollateralWithoutMinting() public depositedCollateral {
-        uint256 userBalance = dsc.balanceOf(user);
-        assertEq(userBalance, 0);
     }
 
 }

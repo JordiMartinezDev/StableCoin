@@ -20,6 +20,8 @@ contract DSCEngineTest is Test{
     address btcUsdPriceFeed;
     address wbtc;
 
+    address public USER = makeAddr("user");
+
     modifier depositedCollateral() {
         vm.startPrank(user);
         ERC20Mock(weth).approve(address(dsce), amountCollateral);
@@ -67,7 +69,7 @@ contract DSCEngineTest is Test{
     // ----------- Deposit Collateral tests -----------
 
     function testRevertsIfCollateralZero() public {
-        vm.startPrank(user);
+        vm.startPrank(USER);
         ERC20Mock(weth).approve(address(dsce), amountCollateral);
 
         vm.expectRevert(DSCEngine.DSCEngine__NeedsMoreThanZero.selector);

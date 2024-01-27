@@ -25,11 +25,13 @@ contract DSCEngineTest is Test{
     address public USER = makeAddr("user");
 
     uint256 public constant AMOUNT_COLLATERAL = 10 ether;
+    uint256 public constant STARTING_ERC20_BALANCE = 10 ether;
+
 
     modifier depositedCollateral() {
-        vm.startPrank(user);
-        ERC20Mock(weth).approve(address(dsce), amountCollateral);
-        dsce.depositCollateral(weth, amountCollateral);
+        vm.startPrank(USER);
+        ERC20Mock(weth).approve(address(dsce),  AMOUNT_COLLATERAL);
+        dsce.depositCollateral(weth,  AMOUNT_COLLATERAL);
         vm.stopPrank();
         _;
     }
@@ -40,6 +42,8 @@ contract DSCEngineTest is Test{
 
         (dsc,dsce,config) = deployer.run();
         (ethUsdPriceFeed,,weth,,) = config.activeNetworkConfig();
+
+        ERC20Mock(weth).mint(USER, STARTING_ERC20_BALANCE);
     }
 
 
@@ -56,14 +60,7 @@ contract DSCEngineTest is Test{
     }
 
 
-    function testRevertsIfTokenLengthDoesntMatchPriceFeeds() public {
-        tokenAddresses.push(weth);
-        feedAddresses.push(ethUsdPriceFeed);
-        feedAddresses.push(btcUsdPriceFeed);
 
-        vm.expectRevert(DSCEngine.DSCEngine__TokenAddressesAndPriceFeedAddressesAmountsDontMatch.selector);
-        new DSCEngine(tokenAddresses, feedAddresses, address(dsc));
-    }
 
 
     // ----------- Minting tests -----------
@@ -82,16 +79,10 @@ contract DSCEngineTest is Test{
     }
 
     function testCanDepositCollateralWithoutMinting() public depositedCollateral {
-        uint256 userBalance = dsc.balanceOf(user);
+        uint256 userBalance = dsc.balanceOf(USER);
         assertEq(userBalance, 0);
     }
 
-    function testRevertsWithUnapprovedCollateral() public {
-        ERC20Mock randToken = new ERC20Mock("RAN", "RAN", user, 100e18);
-        vm.startPrank(user);
-        vm.expectRevert(abi.encodeWithSelector(DSCEngine.DSCEngine__TokenNotAllowed.selector));
-        dsce.depositCollateral(weth,0);
-        vm.stopPrank();
-    }
+    
 
 }

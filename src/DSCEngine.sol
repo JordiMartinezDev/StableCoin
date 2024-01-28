@@ -75,6 +75,7 @@ contract DSCEngine is ReentrancyGuard {
     // ---------- Events ---------- //
 
     event CollateralDeposited(address indexed user, address indexed token, uint256 amount);
+    event CollateralRedeemed(address indexed user, address indexed token, uint indexed amount);
 
     // ---------- Modifiers ---------- //
 
@@ -147,7 +148,7 @@ contract DSCEngine is ReentrancyGuard {
     function redeemCollateral(address tokenCollateralAddress, uint256 amountCollateral) external moreThanZero(amountCollateral) nonReentrant {
 
         s_collateralDeposited[msg.sender][tokenCollateralAddress] -= amountCollateral;
-        emit CollateralRedeemed(msg.sender, amounCollateral, tokenCollateral);
+        emit CollateralRedeemed(msg.sender, tokenCollateral,amounCollateral);
 
     }
 

@@ -159,7 +159,7 @@ contract DSCEngine is ReentrancyGuard {
 
     }
 
-    function redeemCollateralForDSC() external {}
+    function redeemCollateralForDSC(address tokenCollateral, uint256 amountCollateral, uint256 amountDscToBurn) external {}
 
     /**
      * @notice follows CEI

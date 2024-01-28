@@ -107,6 +107,14 @@ contract DSCEngine is ReentrancyGuard {
 
     // ---------- External Functions ---------- //
 
+
+    
+    /**
+     * @param tokenCollateralAddress The address of the token deposited as collateral
+     * @param amountCollateral The amount of collateral deposited 
+     * @param amountDscToMint The amount of Dsc to be minted ( must be lower than the collateral's USD value deposited )
+     * @notice This function allows to deposit and mint in one transfer
+     */
     function depositCollateralAndMintDSC(address tokenCollateralAddress, uint256 amountCollateral, uint256 amountDscToMint) external {
 
         depositCollateral(tokenCollateralAddress, amountCollateral);

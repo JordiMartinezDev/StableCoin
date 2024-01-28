@@ -177,7 +177,7 @@ contract DSCEngine is ReentrancyGuard {
         if(!minted) revert DSCEngine__MintFailed();
     }
 
-    function burnDSC(uint256 amount) external moreThanZero(amount){
+    function burnDSC(uint256 amount) public moreThanZero(amount){
 
         s_DSCminted[msg.sender] -= amount;
         bool success = i_dsc.transferFrom(msg.sender, address(this), amount);
@@ -186,6 +186,7 @@ contract DSCEngine is ReentrancyGuard {
         if(!success) revert DSCEngine__TransferFailed();
 
         i_dsc.burn(amount);
+        _revertIfHealthFactorIsBroken(msg.sender); // This should never hit...
 
     }
 

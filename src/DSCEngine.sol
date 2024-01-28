@@ -181,6 +181,12 @@ contract DSCEngine is ReentrancyGuard {
 
         s_DSCminted[msg.sender] -= amount;
         bool success = i_dsc.transferFrom(msg.sender, address(this), amount);
+
+        // Hypothetically non reachable conditional as it should revert in the previous line
+        if(!success) revert DSCEngine__TransferFailed();
+
+        i_dsc.burn(amount);
+
     }
 
     function liquidate() external {}

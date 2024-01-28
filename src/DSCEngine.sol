@@ -177,7 +177,11 @@ contract DSCEngine is ReentrancyGuard {
         if(!minted) revert DSCEngine__MintFailed();
     }
 
-    function burnDSC() external {}
+    function burnDSC(uint256 amount) external moreThanZero(amount){
+
+        s_DSCminted[msg.sender] -= amount;
+        bool success = i_dsc.transferFrom(msg.sender, address(this), amount);
+    }
 
     function liquidate() external {}
 

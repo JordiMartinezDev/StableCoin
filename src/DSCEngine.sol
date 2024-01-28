@@ -115,6 +115,7 @@ contract DSCEngine is ReentrancyGuard {
      * @param amountDscToMint The amount of Dsc to be minted ( must be lower than the collateral's USD value deposited )
      * @notice This function allows to deposit and mint in one transfer
      */
+     
     function depositCollateralAndMintDSC(address tokenCollateralAddress, uint256 amountCollateral, uint256 amountDscToMint) external {
 
         depositCollateral(tokenCollateralAddress, amountCollateral);
@@ -140,9 +141,17 @@ contract DSCEngine is ReentrancyGuard {
         if (!success) revert DSCEngine__TransferFailed();
     }
 
-    function redeemCollateralForDSC() external {}
+    /* To redeem collateral:
+       1. Health factor over 1 AFTER redeeming their collateral 
+    */ 
+    function redeemCollateral(address tokenCollateralAddress, uint256 amountCollateral) external moreThanZero(amountCollateral) nonReentrant {
 
-    function redeemCollateral() external {}
+        s_collateralDeposited[msg.sender][tokenCollateralAddress] -= amountCollateral;
+        emit CollateralRedeemed(msg.sender, amounCollateral, tokenCollateral);
+
+    }
+
+    function redeemCollateralForDSC() external {}
 
     /**
      * @notice follows CEI

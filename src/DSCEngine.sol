@@ -150,6 +150,13 @@ contract DSCEngine is ReentrancyGuard {
         s_collateralDeposited[msg.sender][tokenCollateralAddress] -= amountCollateral;
         emit CollateralRedeemed(msg.sender, tokenCollateral,amounCollateral);
 
+        bool success = IERC20(tokenCollateralAddress).transfer(msg.sender, amountCollateral);
+        if(!success) {
+            revert DSCEngine__TransferFailed();
+        }
+
+        _revertIfHealthFactorIsBroken(msg.sender);
+
     }
 
     function redeemCollateralForDSC() external {}

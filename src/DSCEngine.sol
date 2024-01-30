@@ -260,7 +260,8 @@ contract DSCEngine is ReentrancyGuard {
         function testRevertsIfMintAmountIsZero() public {
         vm.startPrank(user);
         ERC20Mock(weth).approve(address(dsce), amountCollateral);
-        
+        dsce.depositCollateralAndMintDsc(weth, amountCollateral, amountToMint);
+        vm.expectRevert(DSCEngine.DSCEngine__NeedsMoreThanZero.selector);
         dsce.mintDsc(0);
         vm.stopPrank();
     }

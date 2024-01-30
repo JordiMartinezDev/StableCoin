@@ -193,7 +193,10 @@ contract DSCEngine is ReentrancyGuard {
 
     }
 
-    function liquidate() external {}
+    function liquidate(address collateral, address user, uint256 debtToCover)
+        external
+        moreThanZero(debtToCover)
+        nonReentrant{}
 
     function getHealthFactor() external {}
 
